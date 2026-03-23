@@ -8,7 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@vercel/kv": "^1.0.1",
+    "redis": "^4.6.10",
     "nanoid": "^5.0.9"
   }
 }

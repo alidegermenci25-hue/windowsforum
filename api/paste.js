@@ -1,8 +1,21 @@
-import { kv } from "@vercel/kv";
+import { createClient } from 'redis';
 import { nanoid } from "nanoid";
+
+const client = createClient({ url: process.env.REDIS_URL });
+client.on('error', (err) => console.log('Redis Client Error', err));
+let connected = false;
+
+async function getClient() {
+    if (!connected) {
+        await client.connect();
+        connected = true;
+    }
+    return client;
+}
 
 export default async function handler(req, res) {
   const { method, headers, query, body } = req;
+  const redis = await getClient();
 
   // --- CORS ---
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -23,8 +36,8 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: "You must be logged in to create a paste" });
       }
 
-      const session = await kv.get(`sessions:${sessionToken}`);
-      if (!session) {
+      const sessionJson = await redis.get(`sessions:${sessionToken}`);
+      if (!sessionJson) {
         return res.status(401).json({ error: "Invalid or expired session. Please log in again." });
       }
 
@@ -37,7 +50,7 @@ export default async function handler(req, res) {
       }
 
       const id = nanoid(12);
-      await kv.set(`pastes:${id}`, content);
+      await redis.set(`pastes:${id}`, content);
 
       const siteUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `https://${headers.host}`;
       const rawUrl = `${siteUrl}/raw/${id}`;
@@ -59,7 +72,7 @@ export default async function handler(req, res) {
     }
 
     try {
-      const content = await kv.get(`pastes:${id}`);
+      const content = await redis.get(`pastes:${id}`);
 
       if (!content) {
         return res.status(404).send("Paste not found");

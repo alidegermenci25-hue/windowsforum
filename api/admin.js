@@ -1,9 +1,21 @@
-import { kv } from "@vercel/kv";
+import { createClient } from 'redis';
 
 const ROOT_CODE = process.env.ROOT_CODE || "admin123";
+const client = createClient({ url: process.env.REDIS_URL });
+client.on('error', (err) => console.log('Redis Client Error', err));
+let connected = false;
+
+async function getClient() {
+    if (!connected) {
+        await client.connect();
+        connected = true;
+    }
+    return client;
+}
 
 export default async function handler(req, res) {
     const { method, query, body } = req;
+    const redis = await getClient();
 
     // CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -22,7 +34,7 @@ export default async function handler(req, res) {
     try {
         // --- LIST ALL PASTES ---
         if (action === "list") {
-            const keys = await kv.keys("pastes:*");
+            const keys = await redis.keys("pastes:*");
             const pastes = keys.map(k => ({ key: k.replace("pastes:", "") }));
             return res.status(200).json({ pastes });
         }
@@ -31,7 +43,7 @@ export default async function handler(req, res) {
         if (action === "view") {
             const id = query.id;
             if (!id) return res.status(400).json({ error: "Missing id" });
-            const content = await kv.get(`pastes:${id}`);
+            const content = await redis.get(`pastes:${id}`);
             if (!content) return res.status(404).json({ error: "Paste not found" });
             return res.status(200).json({ id, content });
         }
@@ -40,7 +52,7 @@ export default async function handler(req, res) {
         if (action === "delete") {
             const id = query.id;
             if (!id) return res.status(400).json({ error: "Missing id" });
-            await kv.del(`pastes:${id}`);
+            await redis.del(`pastes:${id}`);
             return res.status(200).json({ ok: true, deleted: id });
         }
 
@@ -49,14 +61,17 @@ export default async function handler(req, res) {
             const id = query.id;
             const newContent = body && body.content;
             if (!id || !newContent) return res.status(400).json({ error: "Missing id or content" });
-            await kv.set(`pastes:${id}`, newContent);
+            await redis.set(`pastes:${id}`, newContent);
             return res.status(200).json({ ok: true, id });
         }
 
         // --- USER MANAGEMENT ---
         if (action === "listUsers") {
-            const keys = await kv.keys("users:*");
-            const users = await Promise.all(keys.map(k => kv.get(k)));
+            const keys = await redis.keys("users:*");
+            const users = await Promise.all(keys.map(async (k) => {
+                const val = await redis.get(k);
+                return val ? JSON.parse(val) : null;
+            }));
             return res.status(200).json({ users: users.filter(Boolean) });
         }
 
@@ -65,7 +80,8 @@ export default async function handler(req, res) {
             const targetUser = query.username || username;
             if (!targetUser) return res.status(400).json({ error: "Username required" });
 
-            let userData = (await kv.get(`users:${targetUser.toLowerCase()}`)) || {};
+            const existingJson = await redis.get(`users:${targetUser.toLowerCase()}`);
+            let userData = existingJson ? JSON.parse(existingJson) : {};
 
             if (password) {
                 const crypto = await import('crypto');
@@ -79,7 +95,7 @@ export default async function handler(req, res) {
             if (username && action === "addUser") userData.username = username;
             if (!userData.createdAt) userData.createdAt = new Date().toISOString();
 
-            await kv.set(`users:${targetUser.toLowerCase()}`, userData);
+            await redis.set(`users:${targetUser.toLowerCase()}`, JSON.stringify(userData));
             return res.status(200).json({ ok: true });
         }
 
