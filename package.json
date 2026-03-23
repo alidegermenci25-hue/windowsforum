@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "WindowsForums — Raw text paste service for PowerShell irm | iex",
   "scripts": {
-    "dev": "vercel dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "vercel dev"
   },
   "dependencies": {
     "redis": "^4.6.10",
