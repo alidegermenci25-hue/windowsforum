@@ -1,0 +1,21 @@
+{
+  "rewrites": [
+    {
+      "source": "/raw/:id",
+      "destination": "/api/paste?id=:id"
+    },
+    {
+      "source": "/api/paste",
+      "destination": "/api/paste"
+    },
+    {
+      "source": "/api/admin",
+      "destination": "/api/admin"
+    },
+    {
+      "source": "/api/auth",
+      "destination": "/api/auth"
+    }
+  ],
+  "cleanUrls": true
+}
