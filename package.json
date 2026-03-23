@@ -1,7 +1,7 @@
 {
-  "name": "windowsforum-js",
+  "name": "windowsforums",
   "version": "1.0.0",
-  "description": "windowsforum js — Raw text paste service for PowerShell irm | iex",
+  "description": "WindowsForums — Raw text paste service for PowerShell irm | iex",
   "scripts": {
     "dev": "vercel dev",
     "build": "next build",

@@ -83,7 +83,7 @@ export default async function handler(req, res) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WindowsForum JS Shield Protection</title>
+  <title>WindowsForums Shield Protection</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
   <style>
     :root { --bg:#0b0c10; --card:#15181f; --accent:#00e5ff; --text:#fff; --dim:#a0a5b1; --border:rgba(255,255,255,0.05); }
@@ -118,14 +118,14 @@ export default async function handler(req, res) {
     <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke-linejoin="round"/>
     <path d="M12 22V12M12 12l9-5M12 12L3 7" stroke-linecap="round"/>
   </svg>
-  <h1 class="title">WindowsForum<span> JS</span> Protection</h1>
+  <h1 class="title">Windows<span>Forums</span> Protection</h1>
   <p class="subtitle">Advanced Script Protection &amp; Verification System</p>
   <div class="card">
     <div class="status">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
       Script Protected
     </div>
-    <p class="desc">This script is protected by <strong>WindowsForum JS</strong> — The most advanced PowerShell script protection system. Direct browser access is blocked to prevent unauthorized copying.</p>
+    <p class="desc">This script is protected by <strong>WindowsForums</strong> — The most advanced PowerShell script protection system. Direct browser access is blocked to prevent unauthorized copying.</p>
     <div class="warning">⚠ This endpoint can only be accessed through PowerShell</div>
     <div class="stats">
       <div class="stat-item"><div class="stat-val">24/7</div><div class="stat-lbl">Protection</div></div>
